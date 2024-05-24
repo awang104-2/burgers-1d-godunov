@@ -5,16 +5,13 @@
 
 
 import numpy as np
-from scipy.linalg import circulant
-from scipy.integrate import solve_ivp
-from scipy.linalg import eig, eigvals
-from scipy.linalg import inv
 import matplotlib.pyplot as plt
 
-def Riemann_Solver(u_l, u_r, z):
-    S = 0.5*(u_l+u_r)
+
+def riemann_solver(u_l, u_r, z):
+    s = 0.5*(u_l+u_r)
     if u_l > u_r:
-        if z <= S:
+        if z <= s:
             return u_l
         else:
             return u_r
@@ -26,127 +23,25 @@ def Riemann_Solver(u_l, u_r, z):
         else:
             return z
         
-# right moving shock as expected for positive u_l > u_r
-u_l = 8; u_r = 2
 
-L = 6; T = 0.0001; Nz = 100; Nx = 100
-x = np.linspace(-L, L, Nx)
-u = 0
-for i in range(len(x)):
-    u = Riemann_Solver(u_l, u_r, x[i]/T)
-    t_i = np.linspace(0, 1, 100)
-    x_i = t_i*u - T*u + x[i]
-    if i%5 == 0:
-        if u == u_l:
-            plt.plot(x_i,t_i,color='red',linestyle='--')
-        else:
-            plt.plot(x_i,t_i,color='blue',linestyle='--')
-x = np.linspace(0, 5, Nx)
-S = (u_l+u_r)/2
-plt.plot(x,x/S,color='black')
-plt.title("$U_L$ > $U_R$ and $U_L$, $U_R$ > 0")
-plt.xlabel("x")
-plt.ylabel("t")
-plt.show()
-
-# left moving shock as expected for negative u_l > u_r 
-u_l = -2; u_r = -8
-
-L = 6; T = 0.0001; Nz = 100; Nx = 100
-x = np.linspace(-L, L, Nx)
-u = 0
-for i in range(len(x)):
-    u = Riemann_Solver(u_l, u_r, x[i]/T)
-    t_i = np.linspace(0, 1, 100)
-    x_i = t_i*u - T*u + x[i]
-    if i%5 == 0:
-        if u == u_l:
-            plt.plot(x_i,t_i,color='red',linestyle='--')
-        else:
-            plt.plot(x_i,t_i,color='blue',linestyle='--')
-x = np.linspace(-5, 0, Nx)
-S = (u_l+u_r)/2
-plt.plot(x,x/S,color='black')
-plt.title("$U_L$ > $U_R$ and $U_L$, $U_R$ < 0")
-plt.xlabel("x")
-plt.ylabel("t")
-plt.show()
-
-# right moving fan in the case of positive u_l < u_r as expected
-u_l = 2; u_r = 8
-
-L = 6; T = 1; Nz = 100; Nx = 100
-x = np.linspace(-L, 2*L, Nx)
-u = 0
-for i in range(len(x)):
-    u = Riemann_Solver(u_l, u_r, x[i]/T)
-    t_i = np.linspace(0, T, 100)
-    x_i = t_i*u - T*u + x[i]
-    if i%5 == 0:
-        if u == u_l:
-            plt.plot(x_i,t_i,color='red',linestyle='--')
-        else:
-            plt.plot(x_i,t_i,color='blue',linestyle='--')
-plt.title("$U_L$ < $U_R$ and $U_L$, $U_R$ > 0")
-plt.xlabel("x")
-plt.ylabel("t")
-plt.show()
-
-# left moving fan in the case of positive u_l < u_r as expected
-u_l = -8; u_r = -2
-
-L = 6; T = 1; Nz = 100; Nx = 100
-x = np.linspace(-2*L, L, Nx)
-u = 0
-for i in range(len(x)):
-    u = Riemann_Solver(u_l, u_r, x[i]/T)
-    t_i = np.linspace(0, T, 100)
-    x_i = t_i*u - T*u + x[i]
-    if i%5 == 0:
-        if u == u_l:
-            plt.plot(x_i,t_i,color='red',linestyle='--')
-        else:
-            plt.plot(x_i,t_i,color='blue',linestyle='--')
-plt.title("$U_L$ < $U_R$ and $U_L$, $U_R$ < 0")
-plt.xlabel("x")
-plt.ylabel("t")
-plt.show()
-
-# centered fan in the case of positive u_l < u_r as expected
-u_l = -8; u_r = 2
-
-L = 6; T = 1; Nz = 100; Nx = 100
-x = np.linspace(-2*L, L, Nx)
-u = 0
-for i in range(len(x)):
-    u = Riemann_Solver(u_l, u_r, x[i]/T)
-    t_i = np.linspace(0, T, 100)
-    x_i = t_i*u - T*u + x[i]
-    if i%5 == 0:
-        if u == u_l:
-            plt.plot(x_i,t_i,color='red',linestyle='--')
-        else:
-            plt.plot(x_i,t_i,color='blue',linestyle='--')
-plt.title("$U_L$ < $U_R$ and $U_L$ < 0, $U_R$ > 0")
-plt.xlabel("x")
-plt.ylabel("t")
-plt.show()
-
-def Trapezoidal_Avg(a,b,F,K):
-    sum = 0
+def trapezoidal_avg(a, b, F, K):
+    total = 0
     for i in range(K):
-        sum = sum + F(a+(b-a)*i/K) + F(a+(b-a)*(i+1)/K)
-    sum = sum/(2*K)
-    return sum
+        total = total + F(a+(b-a)*i/K) + F(a+(b-a)*(i+1)/K)
+    average = total/(2*K)
+    return average
+
 
 def f(x):
     return np.sin(10*x)
 
-def bigF(x):
+
+def big_f(x):
     return -np.cos(10*x)/10
 
-cells = [[0,0.1],[0.1,0.2],[0.2,0.3],[0.3,0.4],[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9],[0.9,1]]
-N = [1,2,3,4,5] # number of points
+
+cells = [[0, 0.1], [0.1, 0.2], [0.2, 0.3],[0.3,0.4],[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9],[0.9,1]]
+N = [1, 2, 3, 4, 5]  # number of points
 avg = []
 actual_avg = []
 error = []
@@ -159,9 +54,9 @@ for j in range(5):
         bounds = cells[i]
         a = bounds[0]
         b = bounds[1]
-        avg.append(np.round(Trapezoidal_Avg(a,b,f,K),6))
-        actual_avg.append(np.round((bigF(b)-bigF(a))/(b-a),6))
-        err = np.round(np.abs((Trapezoidal_Avg(a,b,f,K)-((bigF(b)-bigF(a))/(b-a)))/((bigF(b)-bigF(a))/(b-a))),5)*100
+        avg.append(np.round(trapezoidal_avg(a,b,f,K),6))
+        actual_avg.append(np.round((big_f(b)-big_f(a))/(b-a),6))
+        err = np.round(np.abs((trapezoidal_avg(a,b,f,K)-((big_f(b)-big_f(a))/(b-a)))/((big_f(b)-big_f(a))/(b-a))),5)*100
         error.append(err)
     print("Estimated Average:", avg)
     print("Analytical Average:", actual_avg)
@@ -193,8 +88,8 @@ for j in range(5):
         a = bounds[0]
         b = bounds[1]
         avg.append(np.round(Gauss_Legendre_Avg(a,b,f,K),6))
-        actual_avg.append(np.round((bigF(b)-bigF(a))/(b-a),6))
-        err = np.round(np.abs((Gauss_Legendre_Avg(a,b,f,K)-((bigF(b)-bigF(a))/(b-a)))/((bigF(b)-bigF(a))/(b-a))),4)*100
+        actual_avg.append(np.round((big_f(b)-big_f(a))/(b-a),6))
+        err = np.round(np.abs((Gauss_Legendre_Avg(a,b,f,K)-((big_f(b)-big_f(a))/(b-a)))/((big_f(b)-big_f(a))/(b-a))),4)*100
         error.append(err)
     print("Estimated Average:", avg)
     print("Analytical Average:", actual_avg)
@@ -204,10 +99,12 @@ for j in range(5):
     actual_avg = []
     error = []
     
-def Flux(ustar):
+
+def flux(ustar):
     return ustar**2/2
     
-def Burgers1D_FV_Godunov(U,dt,dx):
+    
+def burgers1d_fv_godunov(U,dt,dx):
     Nx = len(U)
     F = np.zeros(Nx+1)
     Un = np.zeros(Nx)
@@ -219,22 +116,22 @@ def Burgers1D_FV_Godunov(U,dt,dx):
         
     # Solve the Riemann problem and flux for the discrete Un, except boundary cases.
     for i in range(Nx-1):
-        ustar = Riemann_Solver(U[i],U[i+1],0)
-        F[i+1] = Flux(ustar)
+        ustar = riemann_solver(U[i],U[i+1],0)
+        F[i+1] = flux(ustar)
         
     # Left boundary
     if U[0] < 0:
-        ustar = Riemann_Solver(2*U[0]-U[1],U[0],0)
+        ustar = riemann_solver(2*U[0]-U[1],U[0],0)
     else:
-        ustar = Riemann_Solver(U[0],U[0],0)
-    F[0] = Flux(ustar)
+        ustar = riemann_solver(U[0],U[0],0)
+    F[0] = flux(ustar)
     
     # Right boundary
     if U[Nx-1] > 0:
-        ustar = Riemann_Solver(2*U[Nx-1]-U[Nx-2],U[Nx-1],0)
+        ustar = riemann_solver(2*U[Nx-1]-U[Nx-2],U[Nx-1],0)
     else:
-        ustar = Riemann_Solver(U[Nx-1],U[Nx-1],0)
-    F[Nx] = Flux(ustar)
+        ustar = riemann_solver(U[Nx-1],U[Nx-1],0)
+    F[Nx] = flux(ustar)
     
     for i in range(Nx):
         Un[i] = U[i] - (F[i+1]-F[i])*(dt/dx)
@@ -270,7 +167,7 @@ dt = CFL*dx/np.max(np.abs(U_0))
 
 
 while t <= T:
-    Un = Burgers1D_FV_Godunov(U_FV[-1],dt,dx)
+    Un = burgers1d_fv_godunov(U_FV[-1],dt,dx)
     U_FV.append(Un)
     t += dt
     
