@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Burgers1DGodunov.iml" filepath="$PROJECT_DIR$/.idea/Burgers1DGodunov.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../orbiting_masses/.idea/orbiting_masses.iml" filepath="$PROJECT_DIR$/../orbiting_masses/.idea/orbiting_masses.iml" />
     </modules>
   </component>
 </project>
