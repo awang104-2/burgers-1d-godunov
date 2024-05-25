@@ -155,8 +155,8 @@ for j in range(5):
     actual_avg = []
     error = []
 
-domain = [0, 1]
-Nx = 500
+domain = [-1, 1]  # Change this to change the range of x for the FV solver.
+Nx = 1000
 T = 1.5
 cells = []
 for i in range(Nx):
@@ -184,7 +184,7 @@ while t <= T:
     U_FV.append(Un)
     t += dt
 
-x = np.linspace(0, 1, Nx)
+x = np.linspace(domain[0], domain[1], Nx)
 for i in range(16):
     plt.plot(x, U_FV[i * 100])
 plt.title('U(x) from t=0 to t=1.5 by 0.1 increments.')
